@@ -1,0 +1,436 @@
+# ✈️ Airline Passenger Satisfaction Prediction
+
+## 📌 Project Overview
+
+This project uses **Machine Learning classification algorithms** to predict whether an airline passenger is **Satisfied** or **Neutral/Dissatisfied** based on passenger information, travel details, delays, and service ratings.
+
+The project was developed as an **Intermediate Machine Learning project**, focusing not only on model accuracy but also on proper data preprocessing, model comparison, cross-validation, hyperparameter tuning, overfitting detection, and data leakage prevention.
+
+---
+
+## 🎯 Project Objective
+
+The main objective is to build a machine learning model that can predict passenger satisfaction.
+
+The target variable is:
+
+* **Satisfied**
+* **Neutral or Dissatisfied**
+
+The project also aims to answer questions such as:
+
+* Which factors are most related to passenger satisfaction?
+* How do flight delays affect predictions?
+* Does the type of travel affect satisfaction?
+* Does passenger class affect satisfaction?
+* Which machine learning algorithm performs best?
+* Is the final model overfitting?
+* Is there any data leakage?
+
+---
+
+## 📊 Dataset
+
+The dataset contains **129,880 passenger records** and **24 columns**.
+
+The dataset includes information about:
+
+### Passenger Information
+
+* Gender
+* Age
+* Customer Type
+
+### Travel Information
+
+* Type of Travel
+* Class
+* Flight Distance
+
+### Flight Delays
+
+* Departure Delay
+* Arrival Delay
+
+### Service Ratings
+
+* In-flight Wifi Service
+* Ease of Online Booking
+* Online Boarding
+* Gate Location
+* On-board Service
+* Seat Comfort
+* Leg Room Service
+* Cleanliness
+* Food and Drink
+* In-flight Service
+* In-flight Entertainment
+* Baggage Handling
+* Check-in Service
+* Departure and Arrival Time Convenience
+
+### Target
+
+`Satisfaction`
+
+---
+
+## 🔎 Initial Data Analysis
+
+The dataset was inspected before training the models.
+
+### Dataset Shape
+
+```text
+129,880 rows
+24 columns
+```
+
+### Missing Values
+
+Only the `Arrival Delay` column contained missing values:
+
+```text
+393 missing values
+```
+
+These values were handled using **median imputation** inside the preprocessing pipeline.
+
+### Duplicate Rows
+
+```text
+0 duplicate rows
+```
+
+### Target Distribution
+
+| Class                   | Percentage |
+| ----------------------- | ---------: |
+| Neutral or Dissatisfied |     56.55% |
+| Satisfied               |     43.45% |
+
+The target is not perfectly balanced, but the imbalance is not extreme.
+
+---
+
+## 🧹 Data Preprocessing
+
+Several preprocessing steps were performed before model training.
+
+### 1. Remove ID
+
+The `ID` column was removed because it is an identifier and does not represent meaningful passenger information.
+
+### 2. Train/Test Split
+
+The dataset was divided into:
+
+```text
+80% Training
+20% Testing
+```
+
+A stratified split was used to preserve the target distribution.
+
+### 3. Missing Values
+
+Numerical missing values were handled using:
+
+```text
+Median Imputation
+```
+
+Categorical missing values were handled using:
+
+```text
+Most Frequent Value
+```
+
+### 4. Categorical Encoding
+
+Categorical features were converted into numerical features using:
+
+```text
+One-Hot Encoding
+```
+
+### 5. Feature Scaling
+
+Numerical features were standardized using:
+
+```text
+StandardScaler
+```
+
+### 6. Pipeline
+
+The preprocessing steps were implemented inside a **Scikit-learn Pipeline** and **ColumnTransformer**.
+
+This helps prevent data leakage because preprocessing is fitted only on the training data during model training and cross-validation.
+
+---
+
+# 🤖 Machine Learning Models
+
+Three different classification algorithms were tested.
+
+## 1. Logistic Regression
+
+Logistic Regression was used as a baseline model.
+
+It provides a simple and interpretable benchmark for the more complex tree-based models.
+
+---
+
+## 2. Random Forest
+
+Random Forest was used because it can capture nonlinear relationships between passenger characteristics and satisfaction.
+
+The model was then improved using:
+
+**RandomizedSearchCV**
+
+for hyperparameter tuning.
+
+---
+
+## 3. XGBoost
+
+XGBoost was also tested as a powerful gradient boosting algorithm.
+
+It was included to compare its performance against Logistic Regression and Random Forest.
+
+---
+
+# 📈 Model Evaluation
+
+The models were evaluated using:
+
+* Accuracy
+* Precision
+* Recall
+* F1 Score
+* Classification Report
+* Confusion Matrix
+
+F1 Score was especially important because it provides a balance between Precision and Recall.
+
+---
+
+# 🔄 Cross Validation
+
+A **5-Fold Stratified Cross Validation** was used to evaluate model stability.
+
+Final Cross Validation results for the tuned Random Forest:
+
+| Metric    |      Score |
+| --------- | ---------: |
+| Accuracy  | **96.08%** |
+| Precision | **96.57%** |
+| Recall    | **94.32%** |
+| F1 Score  | **95.43%** |
+
+The cross-validation results are very close to the test results, which indicates that the model generalizes well.
+
+---
+
+# ⚙️ Hyperparameter Tuning
+
+Random Forest hyperparameters were optimized using `RandomizedSearchCV`.
+
+The best parameters found were:
+
+```text
+n_estimators = 100
+max_depth = 15
+min_samples_split = 2
+min_samples_leaf = 1
+```
+
+The tuning process used 3-fold cross-validation over a limited number of parameter combinations to maintain reasonable training time.
+
+---
+
+# 🏆 Final Model
+
+The best-performing model was the **Tuned Random Forest Classifier**.
+
+### Test Set Performance
+
+| Metric    |      Score |
+| --------- | ---------: |
+| Accuracy  | **96.41%** |
+| Precision | **97.43%** |
+| Recall    | **94.22%** |
+| F1 Score  | **95.80%** |
+
+The model achieved a strong balance between identifying satisfied passengers and correctly identifying passengers who were not satisfied.
+
+---
+
+# 🧪 Overfitting Check
+
+The final model was evaluated on both training and testing data.
+
+```text
+Training F1 = 97.09%
+Testing F1  = 95.42%
+Difference   = 1.67%
+```
+
+The relatively small difference indicates that there is **no significant overfitting**.
+
+---
+
+# 🔐 Data Leakage Check
+
+Several checks were performed to reduce the risk of data leakage.
+
+* The target column was removed from the features.
+* The `ID` column was removed.
+* Train/Test splitting was performed before model training.
+* Imputation was performed inside the Pipeline.
+* Encoding was performed inside the Pipeline.
+* Scaling was performed inside the Pipeline.
+
+Result:
+
+```text
+No obvious data leakage detected.
+```
+
+---
+
+# 🔍 Feature Importance
+
+Feature importance was extracted from the final Random Forest model to identify the features that contributed most to its predictions.
+
+This helps provide a better understanding of which passenger and service characteristics are most useful for predicting satisfaction.
+
+The project includes a feature-importance visualization showing the top features.
+
+---
+
+# 🧠 What Did We Learn?
+
+The project demonstrates several important Machine Learning concepts:
+
+* Data exploration
+* Data cleaning
+* Handling missing values
+* Categorical encoding
+* Feature scaling
+* Train/Test splitting
+* Machine Learning Pipelines
+* Logistic Regression
+* Random Forest
+* XGBoost
+* Model comparison
+* Cross-validation
+* Hyperparameter tuning
+* Overfitting detection
+* Data leakage prevention
+* Feature importance
+* Model evaluation
+
+---
+
+# 🛠️ Technologies Used
+
+* Python
+* Pandas
+* NumPy
+* Matplotlib
+* Seaborn
+* Scikit-learn
+* XGBoost
+* Joblib
+* Google Colab / Jupyter Notebook
+
+---
+
+# 📁 Project Structure
+
+Recommended GitHub structure:
+
+```text
+Airline-Passenger-Satisfaction-Prediction/
+│
+├── airline_passenger_satisfaction.csv
+│
+├── Airline_Passenger_Satisfaction.ipynb
+│
+├── airline_satisfaction_final_model.pkl
+│
+├── README.md
+│
+└── images/
+    ├── satisfaction_distribution.png
+    ├── confusion_matrix.png
+    └── feature_importance.png
+```
+
+The dataset can also be excluded from GitHub if the repository size becomes an issue, with a link to the original dataset instead.
+
+---
+
+# ▶️ How to Run
+
+## Option 1 — Google Colab
+
+1. Open the `.ipynb` file using Google Colab.
+2. Upload `airline_passenger_satisfaction.csv`.
+3. Run the notebook cells in order.
+4. The notebook will train and evaluate the models.
+
+## Option 2 — Local Environment
+
+Install the required libraries:
+
+```bash
+pip install pandas numpy matplotlib seaborn scikit-learn xgboost joblib
+```
+
+Then open the notebook using Jupyter Notebook or VS Code.
+
+---
+
+# 📌 Final Conclusion
+
+This project successfully developed a machine learning system for predicting airline passenger satisfaction.
+
+Several models were compared, including Logistic Regression, Random Forest, and XGBoost.
+
+After hyperparameter tuning, the **Random Forest model** achieved the best overall performance with:
+
+```text
+Accuracy:  96.41%
+Precision: 97.43%
+Recall:    94.22%
+F1 Score:  95.80%
+```
+
+Cross-validation produced an F1 Score of approximately **95.43%**, while the training/testing F1 difference was only about **1.67%**.
+
+These results indicate that the final model performs well and generalizes effectively to unseen data.
+
+---
+
+## 🚀 Future Improvements
+
+Possible future improvements include:
+
+* Testing additional boosting algorithms
+* Advanced hyperparameter optimization
+* Explainable AI techniques such as SHAP
+* Deploying the model using Streamlit
+* Creating an interactive passenger satisfaction prediction interface
+* Monitoring model performance on new airline data
+
+---
+
+## 👨‍💻 Project
+
+**Airline Passenger Satisfaction Prediction**
+
+Machine Learning Classification Project
